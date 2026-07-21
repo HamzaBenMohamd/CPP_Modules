@@ -47,13 +47,13 @@ Bureaucrat &Bureaucrat::operator=(const Bureaucrat &assign)
 //? overrided what() fun of GradTooLowException class
 const char *Bureaucrat::GradeTooHighException::what() const throw()
 {
-	return "Too High grade!\n";
+	return "Too High grade!";
 }
 
 //? overrided what() fun of GradTooLowException class
 const char *Bureaucrat::GradeTooLowException::what() const throw()
 {
-	return "Too Low grade!\n";
+	return "Too Low grade!";
 }
 
 //! --- getters ---
@@ -89,6 +89,7 @@ void Bureaucrat::decrementGrade()
 	this->_grade++;
 }
 
+//?
 std::ostream &operator<<(std::ostream &out, const Bureaucrat &bureaucrat)
 {
 	out << bureaucrat.getName() << ", bureaucrat grade " << bureaucrat.getGrade() << '.' << '\n';
