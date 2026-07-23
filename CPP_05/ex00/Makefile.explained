@@ -1,0 +1,69 @@
+NAME = bureaucrat
+# ^ NAME: the name of the final executable file. When we run `make`, the linker produces
+#   a binary called `bureaucrat`. This name is arbitrary but should match the project.
+
+CXX = c++
+# ^ CXX: the C++ compiler. Setting this to `c++` instead of `g++` ensures portability
+#   across systems (macOS uses `c++` as the default C++ compiler). The subject requires
+#   compiling with `c++` specifically.
+
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+# ^ CXXFLAGS: compiler flags sent to $(CXX).
+#   -Wall: enable all common warning messages. Helps catch potential bugs.
+#   -Wextra: enable extra warnings beyond -Wall. Even stricter checking.
+#   -Werror: treat all warnings as errors. No warnings are tolerated — the build fails
+#     if any warning appears. This is a subject requirement.
+#   -std=c++98: force the compiler to use the C++98 standard. Features from C++11 or
+#     later (auto, range-based for, nullptr, etc.) will be rejected. This is REQUIRED
+#     by the subject: "Don't forget this project has to follow the C++98 standard."
+
+SRCS = Bureaucrat.cpp main.cpp
+# ^ SRCS: list of source files to compile. Only Bureaucrat.cpp (class implementation)
+#   and main.cpp (tests) are needed. The header Bureaucrat.hpp is #included, not compiled
+#   directly.
+#   NOTE: tmp.cpp is NOT in SRCS — it is kept in the directory as a draft/backup but
+#   is not compiled in the final build.
+
+OBJS = $(SRCS:.cpp=.o)
+# ^ OBJS: derived from SRCS by replacing the .cpp extension with .o.
+#   This is a Makefile substitution reference. For example, Bureaucrat.cpp becomes
+#   Bureaucrat.o. These .o files are the compiled object files produced by the compiler.
+
+all: $(NAME)
+# ^ all: the default target (first target in the Makefile). Running `make` without
+#   arguments runs `all`, which depends on $(NAME) (the executable).
+#   If $(NAME) does not exist or is older than any .o file, it will be rebuilt.
+
+$(NAME): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
+# ^ $(NAME): link target. Depends on all object files ($(OBJS)). The recipe links them
+#   into the final executable. The `-o $(NAME)` flag specifies the output filename.
+#   This is the final step: .o files -> executable binary.
+
+%.o: %.cpp Bureaucrat.hpp Makefile
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+# ^ pattern rule: how to build a .o file from its corresponding .cpp file.
+#   %.o matches any .o file; %.cpp is its corresponding source.
+#   Bureaucrat.hpp and Makefile are ADDITIONAL dependencies:
+#     - Bureaucrat.hpp: if the header changes, ALL .o files are recompiled (since
+#       both .cpp files include it). Without this, changing the header would not
+#       trigger recompilation of .cpp files that #include it.
+#     - Makefile: if the Makefile itself changes (e.g. a new flag), everything
+#       recompiles. This is a good practice to prevent stale builds.
+#   $<: automatic variable — the first prerequisite (the .cpp file).
+#   $@: automatic variable — the target name (the .o file).
+#   -c: compile only (no linking). Produces a .o file.
+
+clean:
+	rm -f $(OBJS)
+# ^ clean: removes all object files (.o). The executable is NOT removed.
+#   -f: "force" — suppress errors if files don't exist.
+
+fclean: clean
+	rm -f $(NAME)
+# ^ fclean: "full clean". First runs clean (removes .o files), then removes the
+#   executable ($(NAME)). After fclean, the directory is back to a source-only state.
+
+re: fclean all
+# ^ re: "rebuild". First runs fclean (completely clean), then runs all (rebuild from
+#   scratch). This guarantees a clean build.

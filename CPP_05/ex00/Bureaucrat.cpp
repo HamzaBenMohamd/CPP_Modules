@@ -1,12 +1,14 @@
 #include "Bureaucrat.hpp"
 
+//! --- Orthodox Canonical Form ---
+
 //? Default Constructor
 Bureaucrat::Bureaucrat() : _name("Anonymous"), _grade(5)
 {
 	std::cout << "Default Constructor called of Bureaucrat" << std::endl;
 }
 
-//? Parameters Constructor
+//? Parameterized Constructor
 Bureaucrat::Bureaucrat(std::string name, int grade) : _name(name)
 {
 	std::cout << "Default Parameters Constructor called of Bureaucrat" << std::endl;
@@ -75,8 +77,7 @@ int Bureaucrat::getGrade() const
 //?
 void Bureaucrat::incrementGrade()
 {
-	// 5 => 4
-	if (this->_grade - 1 < 1)
+	if (this->_grade <= 1)
 		throw Bureaucrat::GradeTooHighException();
 	this->_grade--;
 }
@@ -84,7 +85,7 @@ void Bureaucrat::incrementGrade()
 //?
 void Bureaucrat::decrementGrade()
 {
-	if (this->_grade + 1 > 150)
+	if (this->_grade >= 150)
 		throw Bureaucrat::GradeTooLowException();
 	this->_grade++;
 }
