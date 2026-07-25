@@ -61,7 +61,7 @@ const char *Bureaucrat::GradeTooLowException::what() const throw()
 //! --- getters ---
 
 //?
-std::string Bureaucrat::getName() const
+const std::string& Bureaucrat::getName() const
 {
 	return this->_name;
 }
