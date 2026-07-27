@@ -96,10 +96,18 @@ void Bureaucrat::signAForm(AForm &form)
     }
 }
 
-// 
+// Attempts to execute a form
 void Bureaucrat::executeForm(AForm const & form) const
 {
-	//todo
+    try
+    {
+        form.execute(*this);
+        std::cout << getName() << " executed " << form.getName() << '\n';
+    }
+    catch(const std::exception& e)
+    {
+        std::cout << getName() << " couldn't execute " << form.getName() << " because " << e.what() << '\n';
+    }
 }
 
 // Overloads the << operator to print the Bureaucrat's info
