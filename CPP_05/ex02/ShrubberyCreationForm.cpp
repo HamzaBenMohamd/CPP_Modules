@@ -30,12 +30,13 @@ ShrubberyCreationForm &ShrubberyCreationForm::operator=(const ShrubberyCreationF
     std::cout << "Copy Assignment Operator called of ShrubberyCreationForm" << std::endl;
     if (this != &assign)
     {
-        // _member = assign._member;
+        AForm::operator=(assign);
+        this->_target = assign._target;
     }
     return (*this);
 }
 
-//
+// Executes the shrubbery creation action
 void ShrubberyCreationForm::execute(Bureaucrat const & executor) const
 {
     if (!getSigned())
@@ -45,7 +46,7 @@ void ShrubberyCreationForm::execute(Bureaucrat const & executor) const
 
     std::ofstream outfile((_target + "_shrubbery").c_str());
     if (outfile.is_open())
-    { //todo: make this tree better look
+    {
         outfile << "       _-_\n"
         << "    /~~   ~~\\\n"
         << " /~~         ~~\\\n"
