@@ -1,30 +1,30 @@
 #include "PresidentialPardonForm.hpp"
 
-// Default Constructor
+//? Default Constructor
 PresidentialPardonForm::PresidentialPardonForm() : AForm("PresidentialPardonForm", 25, 5), _target("PresidentialPardonForm")
 {
     std::cout << "Default Constructor called of PresidentialPardonForm" << std::endl;
 }
 
-// Parameterized Constructor
+//? Parameterized Constructor
 PresidentialPardonForm::PresidentialPardonForm(std::string target) : AForm("PresidentialPardonForm", 25, 5), _target(target)
 {
     std::cout << "Parameterized Constructor called of PresidentialPardonForm" << std::endl;
 }
 
-// Copy Constructor
+//? Copy Constructor
 PresidentialPardonForm::PresidentialPardonForm(const PresidentialPardonForm &copy) : AForm(copy), _target(copy._target)
 {
     std::cout << "Copy Constructor called of PresidentialPardonForm" << std::endl;
 }
 
-// Destructor
+//? Destructor
 PresidentialPardonForm::~PresidentialPardonForm()
 {
     std::cout << "Destructor called of PresidentialPardonForm" << std::endl;
 }
 
-// Copy Assignment Operator
+//? Copy Assignment Operator
 PresidentialPardonForm &PresidentialPardonForm::operator=(const PresidentialPardonForm &assign)
 {
     std::cout << "Copy Assignment Operator called of PresidentialPardonForm" << std::endl;
@@ -36,7 +36,7 @@ PresidentialPardonForm &PresidentialPardonForm::operator=(const PresidentialPard
     return (*this);
 }
 
-// Executes the presidential pardon action
+//? Executes the presidential pardon action
 void PresidentialPardonForm::execute(Bureaucrat const & executor) const
 {
     if (!getSigned())

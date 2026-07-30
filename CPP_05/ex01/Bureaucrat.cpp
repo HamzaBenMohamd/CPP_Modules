@@ -1,12 +1,12 @@
 #include "Bureaucrat.hpp"
 
-// Default Constructor
+//? Default Constructor
 Bureaucrat::Bureaucrat() : _name("Anonymous"), _grade(5)
 {
 	std::cout << "Default Constructor called of Bureaucrat" << std::endl;
 }
 
-// Parameterized Constructor with name and grade; throws on invalid grade
+//? Parameterized Constructor with name and grade; throws on invalid grade
 Bureaucrat::Bureaucrat(std::string name, int grade) : _name(name)
 {
 	std::cout << "Parameterized Constructor called of Bureaucrat" << std::endl;
@@ -19,19 +19,19 @@ Bureaucrat::Bureaucrat(std::string name, int grade) : _name(name)
 		this->_grade = grade;
 }
 
-// Copy Constructor
+//? Copy Constructor
 Bureaucrat::Bureaucrat(const Bureaucrat &copy) : _name(copy._name), _grade(copy._grade)
 {
 	std::cout << "Copy Constructor called of Bureaucrat" << std::endl;
 }
 
-// Destructor
+//? Destructor
 Bureaucrat::~Bureaucrat()
 {
 	std::cout << "Destructor called of Bureaucrat" << std::endl;
 }
 
-// Copy Assignment Operator (copies grade only; name stays const)
+//? Copy Assignment Operator (copies grade only; name stays const)
 Bureaucrat &Bureaucrat::operator=(const Bureaucrat &assign)
 {
 	std::cout << "Copy Assignment Operator called of Bureaucrat" << std::endl;
@@ -42,31 +42,31 @@ Bureaucrat &Bureaucrat::operator=(const Bureaucrat &assign)
 	return (*this);
 }
 
-// Returns the error description for a grade that is too high
+//? Returns the error description for a grade that is too high
 const char *Bureaucrat::GradeTooHighException::what() const throw()
 {
 	return "Too High grade!";
 }
 
-// Returns the error description for a grade that is too low
+//? Returns the error description for a grade that is too low
 const char *Bureaucrat::GradeTooLowException::what() const throw()
 {
 	return "Too Low grade!";
 }
 
-// Returns the Bureaucrat's name
+//? Returns the Bureaucrat's name
 const std::string& Bureaucrat::getName() const
 {
 	return this->_name;
 }
 
-// Returns the Bureaucrat's grade
+//? Returns the Bureaucrat's grade
 int Bureaucrat::getGrade() const
 {
 	return this->_grade;
 }
 
-// Increments grade (raises rank by one); throws GradeTooHighException if grade is 1
+//? Increments grade (raises rank by one); throws GradeTooHighException if grade is 1
 void Bureaucrat::incrementGrade()
 {
 	if (this->_grade <= 1)
@@ -74,7 +74,7 @@ void Bureaucrat::incrementGrade()
 	this->_grade--;
 }
 
-// Decrements grade (lowers rank by one); throws GradeTooLowException if grade is 150
+//? Decrements grade (lowers rank by one); throws GradeTooLowException if grade is 150
 void Bureaucrat::decrementGrade()
 {
 	if (this->_grade >= 150)
@@ -82,7 +82,7 @@ void Bureaucrat::decrementGrade()
 	this->_grade++;
 }
 
-// Attempts to sign a Form; prints success or failure message
+//? Attempts to sign a Form; prints success or failure message
 void Bureaucrat::signForm(Form &form)
 {
     try
@@ -96,7 +96,7 @@ void Bureaucrat::signForm(Form &form)
     }
 }
 
-// Overloads the << operator to print the Bureaucrat's info
+//? Overloads the << operator to print the Bureaucrat's info
 std::ostream &operator<<(std::ostream &out, const Bureaucrat &bureaucrat)
 {
 	out << bureaucrat.getName() << ", bureaucrat grade " << bureaucrat.getGrade() << '.' << '\n';

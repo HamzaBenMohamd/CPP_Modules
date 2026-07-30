@@ -2,9 +2,12 @@
 # define RobotomyRequestForm_HPP
 
 # include <iostream>
+# include <string>
+# include <stdexcept>
 # include <cstdlib>
 # include <ctime>
 # include "AForm.hpp"
+# include "Bureaucrat.hpp"
 
 class RobotomyRequestForm : public AForm
 {

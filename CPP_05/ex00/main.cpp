@@ -116,6 +116,5 @@ int main()
 		std::cout << a;
 	}
 
-	std::cout << "\n=== All tests passed! ===" << '\n';
 	return 0;
 }

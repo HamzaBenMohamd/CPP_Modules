@@ -3,7 +3,9 @@
 
 # include <iostream>
 # include <string>
+# include <stdexcept>
 # include "AForm.hpp"
+# include "Bureaucrat.hpp"
 
 class PresidentialPardonForm : public AForm
 {
