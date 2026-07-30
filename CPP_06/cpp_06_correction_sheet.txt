@@ -1,0 +1,59 @@
+----- Prerequisites -----
+The code must compile with c++ and the flags -Wall -Wextra -Werror
+Don't forget this project has to follow the C++98 standard. Thus,
+C++11 (and later) functions or containers are NOT expected.
+
+Any of these means you must not grade the exercise in question:
+
+* A function is implemented in a header file (except for template functions).
+* A Makefile compiles without the required flags and/or another compiler than c++.
+
+Any of these means that you must flag the project with "Forbidden
+Function":
+
+* Use of a "C" function (*alloc, *printf, free).
+* Use of a function not allowed in the exercise guidelines.
+* Use of "using namespace <ns_name>" or the "friend" keyword.
+* Use of an external library, or features from versions other than C++98.
+
+----- Exercise 00: Conversion of scalar types -----
+This exercise is about using the static_cast.
+
+Scalar conversion
+Did the student create a class with a private constructor, and static
+methods ?
+Did the student use the static_cast to convert values?
+Accept the use of implicit casts for promotion casts only.
+Does the program work as required?
+
+Anyway, please don't be too uncompromising towards the exercise's outputs
+if the spirit of the exercise is respected.
+Even if this exercise is wrong, continue the evaluation process.
+
+----- Exercise 01: Serialization -----
+This exercise is about using the reinterpret_cast.
+
+Retyping of raw data
+Does the program work as required?
+Did the student create a class with a private constructor, and static
+methods ?
+The reinterpret_cast<> should be used twice:
+
+- First from data* to uintptr_t.
+- Then, from uintptr_t to data*.
+
+And the resulting data struct should be usable.
+
+----- Exercise 02: Identify real type -----
+This exercise is about using the dynamic_cast.
+
+Real type identification
+Does the program work as required?
+Check the code. Did the student use the dynamic_cast to identify the real
+type?
+void identify(Base* p) should check if the cast return is NULL.
+void identify(Base& p) should use a try and catch block to check if the cast failed.
+
+(In case you're wondering, the header <typeinfo> must not appear
+anywhere.)
+
