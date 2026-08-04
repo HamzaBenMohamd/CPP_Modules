@@ -140,7 +140,7 @@ void ScalarConverter::printDouble(double d_val, bool imp_d, bool imp_i)
 }
 
 //? convert literal to its type (if it's possible)
-void ScalarConverter::convert(const std::string &literal) //todo call mhoussas to test it
+void ScalarConverter::convert(const std::string &literal)
 {
     e_literal_type type = ScalarConverter::detectType(literal);
 
