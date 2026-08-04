@@ -276,3 +276,8 @@ void ScalarConverter::convert(const std::string &literal) //todo call mhoussas t
     printFloat(f_val, imp_f, imp_i);
     printDouble(d_val, imp_d, imp_i);
 }
+
+/*
+* prompt:
+* i think that ex00 is done! based on the subject + correction sheet I want you to do a code review over ex00 and make sure that it respect the subject's requirments and respect the correction sheet! if everything is good, go and test the program (ex00) (edge cases ... normal cases ... ) anything! to make sure that the ex00 is clean! and ready to submet!
+*/
