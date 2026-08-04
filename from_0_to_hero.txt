@@ -1,0 +1,134 @@
+===============================================================================
+FROM 0 TO HERO - HOW TO START A C++ DAY WITHOUT WASTING TIME
+===============================================================================
+
+The problem: you open a new module, you stare at the subject, you get lost,
+you re-read it 10 times, you waste hours, then you finally figure out the
+structure and realize you always follow the SAME path.
+
+Solution: follow this checklist EVERY day. Print it, memorize it, use it.
+Don't start coding before step 4. Step 4 is the one that saves you.
+
+------------------------------------------------------------------------------
+STEP 0 - Setup the skeleton (fast, mechanical)
+------------------------------------------------------------------------------
+1. Read the GENERAL RULES section of the subject FIRST (only once, skim).
+   - Compiler: c++ -Wall -Wextra -Werror (-std=c++98 must still work)
+   - Naming: directories ex00, ex01, ... Classes in UpperCamelCase.
+     Files named after the class: ClassName.hpp / ClassName.cpp.
+   - Orthogonal Canonical Form required (from Module 02 to 09) unless said otherwise.
+   - Include guards in every header.
+   - for each exercise: detect which CAST is needed (Module 06 theme).
+2. Create the exercise directories and the empty files you already know you
+   need, based ONLY on the classes named in the subject (or their obvious
+   companions: main.cpp, Makefile) use AI in this step.
+3. Write the Makefile (you already have the template, reuse it, adapt NAME).
+   use AI in this step too.
+
+------------------------------------------------------------------------------
+STEP 1 - Read the subject like an engineer, not like a student
+------------------------------------------------------------------------------
+For EACH exercise, extract on paper (or in comments):
+   - "Directory" / "Files to Submit"       -> what must exist.
+   - The exact class names and method signatures the subject gives.
+     e.g. "uintptr_t serialize(Data* ptr);" -> copy them VERBATIM into the header.
+   - "Forbidden" section                    -> what NOT to use. This is a hint
+     about the CONCEPT the exercise wants you to learn. Write it down.
+   - The examples at the bottom. They show exact OUTPUT. Copy the format.
+   - The "Additional Rule" of the module (e.g. Module 06 = casts). Apply it.
+
+   OUTPUT DELIVERABLE: a list for each exercise:
+     - classes + signatures
+     - forbidden things
+     - example outputs (keep them as your future test cases)
+
+------------------------------------------------------------------------------
+STEP 2 - Identify the concept to STUDY (the real goal of the day)
+------------------------------------------------------------------------------
+The subject never says "today you learn X". You must deduce X from:
+   - The module title (Module 06 = "C++ casts" -> study the 4 casts).
+   - The "Forbidden" hints (ex02 forbids typeinfo -> dynamic_cast is the answer).
+   - The class/function names (Serializer + uintptr_t -> reinterpret_cast).
+Before writing ANY code, list the concepts:
+   - Module 06: static_cast, dynamic_cast, reinterpret_cast, const_cast.
+   - If you can't name the concepts, READ about them first.
+   Spend 20-40 min studying with cppreference BEFORE coding.
+   OUTPUT DELIVERABLE: a short list of concepts per exercise + 1-2 lines
+   explaining what each one is for.
+
+------------------------------------------------------------------------------
+STEP 3 - Write the PSEUDOCODE of the whole program (per exercise)
+------------------------------------------------------------------------------
+This is the step that ends the "lost" feeling. Before touching code, describe
+in plain language / comments what the program does:
+
+   ex00/convert:
+     main: check argc == 2 -> ScalarConverter::convert(argv[1])
+     convert: detect type -> parse string to double -> static_cast to char,
+     int, float, double -> print with special cases (impossible / Non displayable)
+
+   ex01/serializer:
+     main: create Data d -> serialize(&d) -> deserialize(serialized) ->
+     compare with &d
+
+   ex02/identify:
+     generate(): random A/B/C -> identify(Base*) -> identify(Base&)
+
+Use comments like // TODO or // STEP 1/2/3 directly in the files. You already
+have this pattern in ex00 from the previous session. Apply it to every file.
+OUTPUT DELIVERABLE: pseudocode comments inside each .cpp/.hpp file.
+
+------------------------------------------------------------------------------
+STEP 4 - Write the HEADERS FIRST (interface before implementation)
+------------------------------------------------------------------------------
+Always start with the .hpp files:
+   - class name, inheritance, all method signatures from the subject.
+   - the canonical form (default ctor, copy ctor, copy assign, dtor) when
+     required.
+   - includes + include guards.
+Then compile-check the header alone (a dummy main) BEFORE writing logic.
+This forces you to nail the interface = half the design is done.
+
+------------------------------------------------------------------------------
+STEP 5 - Implement bottom-up, test at every step
+------------------------------------------------------------------------------
+Implement in this order:
+   1. Simple classes first (Data, Base, A/B/C).
+   2. Classes that depend on them (Serializer, ScalarConverter).
+   3. main.cpp last, then test against the subject's example outputs.
+Build after EVERY small step (make + run). Never write 300 lines then compile.
+
+------------------------------------------------------------------------------
+STEP 6 - Final checklist (before you submit / get evaluated)
+------------------------------------------------------------------------------
+- make re -> compiles with -Wall -Wextra -Werror, and also with -std=c++98.
+- Every header has include guards and compiles independently.
+- All classes are in Orthodox Canonical Form (when required) even if unused.
+- No forbidden things: printf, alloc/free, using namespace, friend, <typeinfo>,
+  C++11+, STL containers/algorithms (before module 08).
+- Every output ends with '\n'.
+- Memory: every new has a delete; no leaks (test with valgrind if available).
+- Output matches the subject examples EXACTLY.
+- You can explain at the defense WHICH cast you used and WHY.
+
+===============================================================================
+THE ONE-LINE SUMMARY
+===============================================================================
+read subject
+    |
+extract classes/signatures/forbidden/examples
+    |
+deduce the concepts
+    |
+study them briefly
+    |
+pseudocode in comments
+    |
+write headers
+    |
+implement bottom-up
+    |
+test with subject examples
+    |
+final checklist
+===============================================================================
