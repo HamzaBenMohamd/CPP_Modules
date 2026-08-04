@@ -87,11 +87,10 @@ ScalarConverter::e_literal_type ScalarConverter::detectType(const std::string &l
 	return INT;
 }
 
-//? 
-void ScalarConverter::convert(const std::string &literal)
+//? convert literal to its type (if it's possible)
+void ScalarConverter::convert(const std::string &literal) //todo test edge cases and make sure this fun is perfect! and meet the correction sheet and the subject's requirements (asigne this task to opencode)
 {
     e_literal_type type = ScalarConverter::detectType(literal);
-	std::cout << "Type: " << type << '\n';                                                         //! for debuging
 
     if (type == INVALID)
     {
@@ -99,12 +98,6 @@ void ScalarConverter::convert(const std::string &literal)
         return;
     }
 
-    // =========================================================================
-    // STEP B - STORAGE + "IMPOSSIBLE" FLAGS
-    //   c_val / i_val / f_val / d_val : the final values that will be printed.
-    //   imp_c / imp_i / imp_f / imp_d : true when that conversion "does not make
-    //   sense or overflows" (subject wording) -> we print "impossible".
-    // =========================================================================
     char   c_val = 0;
     int    i_val = 0;
     float  f_val = 0.0f;
@@ -127,15 +120,11 @@ void ScalarConverter::convert(const std::string &literal)
         }
         case INT:
         {
-			//logic: convert string to long using strtol() and check it's errno because it set an errno,
-			//		if the number is larger than long_max or long_min,
-			//		and check using if else if the number is > int_max or < int_min
+            errno = 0;
+            char *endptr;
+            long actual_long = std::strtol(literal.c_str(), &endptr, 10);
 
-            char *endptr;                           // will point past the parsed number
-            long actual_long = std::strtol(literal.c_str(), &endptr, 10); //todo understand this strtol fun and it's parameters
-
-            // overflow check vs the int range
-            if (actual_long > std::numeric_limits<int>::max() || actual_long < std::numeric_limits<int>::min())
+            if (errno == ERANGE || actual_long > std::numeric_limits<int>::max() || actual_long < std::numeric_limits<int>::min())
             {
                 imp_c = imp_i = imp_f = imp_d = true;
             }
@@ -148,77 +137,82 @@ void ScalarConverter::convert(const std::string &literal)
                 f_val = static_cast<float>(actual_int);
                 d_val = static_cast<double>(actual_int);
 
-                // value fits an int but not a char
                 if (actual_int < std::numeric_limits<char>::min() || actual_int > std::numeric_limits<char>::max())
                     imp_c = true;
             }
             break;
         }
-
-        // ---------------------------------------------------------------------
-        // CASE FLOAT : literal is a float like "42.0f", "-4.2f", or the
-        //   pseudo-literals "nanf", "+inff", "-inff".
-        //   C++98 has no std::strtof -> use std::strtod then cast to float.
-        //   For the float pseudo-literals, char and int are impossible
-        //   (NaN/inf are not representable in those types), but float and
-        //   double ARE representable -> we keep imp_f / imp_d false.
-        //   For normal floats: check the int/char ranges, like in the INT case.
-        // ---------------------------------------------------------------------
         case FLOAT:
         {
             char *endptr;
-            float actual_float = static_cast<float>(std::strtod(literal.c_str(), &endptr));
-
-            f_val = actual_float;                       // actual type
-
-            c_val = static_cast<char>(actual_float);
-            i_val = static_cast<int>(actual_float);
-            d_val = static_cast<double>(actual_float);
+            errno = 0;
+            
+            double temp_double = std::strtod(literal.c_str(), &endptr);
 
             if (literal == "nanf" || literal == "-inff" || literal == "+inff")
             {
-                imp_c = imp_i = true;                   // NaN/inf -> no char, no int
+                f_val = static_cast<float>(temp_double);
+                d_val = temp_double;
+                imp_c = imp_i = true;
             }
             else
             {
-                if (actual_float > static_cast<float>(std::numeric_limits<int>::max())
-                    || actual_float < static_cast<float>(std::numeric_limits<int>::min()))
-                    imp_i = true;
-                if (actual_float > static_cast<float>(std::numeric_limits<char>::max())
-                    || actual_float < static_cast<float>(std::numeric_limits<char>::min()))
-                    imp_c = true;
+                if (errno == ERANGE || temp_double > std::numeric_limits<float>::max() || temp_double < -std::numeric_limits<float>::max())
+                {
+                    imp_f = imp_c = imp_i = true;
+                    d_val = temp_double;
+                }
+                else
+                {
+                    float actual_float = static_cast<float>(temp_double);
+                    f_val = actual_float;
+                    d_val = static_cast<double>(actual_float);
+
+                    if (actual_float > static_cast<float>(std::numeric_limits<int>::max()) || actual_float < static_cast<float>(std::numeric_limits<int>::min()))
+                        imp_i = true;
+                    else
+                        i_val = static_cast<int>(actual_float);
+
+                    if (actual_float > static_cast<float>(std::numeric_limits<char>::max()) || actual_float < static_cast<float>(std::numeric_limits<char>::min()))
+                        imp_c = true;
+                    else
+                        c_val = static_cast<char>(actual_float);
+                }
             }
             break;
         }
-
-        // ---------------------------------------------------------------------
-        // CASE DOUBLE : literal is a double like "4.2" or the pseudo-literals
-        //   "nan", "+inf", "-inf". Same logic as FLOAT, but the actual type is
-        //   double (no extra strtod->float cast).
-        // ---------------------------------------------------------------------
-        case DOUBLE:
+        case DOUBLE: 
         {
             char *endptr;
+            errno = 0;
             double actual_double = std::strtod(literal.c_str(), &endptr);
-
-            d_val = actual_double;                      // actual type
-
-            c_val = static_cast<char>(actual_double);
-            i_val = static_cast<int>(actual_double);
-            f_val = static_cast<float>(actual_double);
 
             if (literal == "nan" || literal == "-inf" || literal == "+inf")
             {
-                imp_c = imp_i = true;                   // NaN/inf -> no char, no int
+                d_val = actual_double;
+                f_val = static_cast<float>(actual_double);
+                imp_c = imp_i = true;
             }
             else
             {
-                if (actual_double > static_cast<double>(std::numeric_limits<int>::max())
-                    || actual_double < static_cast<double>(std::numeric_limits<int>::min()))
-                    imp_i = true;
-                if (actual_double > static_cast<double>(std::numeric_limits<char>::max())
-                    || actual_double < static_cast<double>(std::numeric_limits<char>::min()))
-                    imp_c = true;
+                if (errno == ERANGE)
+                    imp_d = imp_f = imp_c = imp_i = true;
+                else
+                {
+                    d_val = actual_double;
+                    if (actual_double > static_cast<double>(std::numeric_limits<float>::max()) || actual_double < -static_cast<double>(std::numeric_limits<float>::max()))
+                        imp_f = true;
+                    else
+                        f_val = static_cast<float>(actual_double);
+                    if (actual_double > static_cast<double>(std::numeric_limits<int>::max()) || actual_double < static_cast<double>(std::numeric_limits<int>::min()))
+                        imp_i = true;
+                    else
+                        i_val = static_cast<int>(actual_double);
+                    if (actual_double > static_cast<double>(std::numeric_limits<char>::max()) || actual_double < static_cast<double>(std::numeric_limits<char>::min()))
+                        imp_c = true;
+                    else
+                        c_val = static_cast<char>(actual_double);
+                }
             }
             break;
         }
@@ -226,18 +220,7 @@ void ScalarConverter::convert(const std::string &literal)
             break;
     }
 
-    // =========================================================================
-    // STEP D - PRINT THE 4 LINES (exact order required by the subject)
-    //   format:  char:  X
-    //            int:   X
-    //            float: Xf
-    //            double:X
-    // =========================================================================
-
-    // --- CHAR : 3 possible outputs ---
-    //   "impossible"      -> NaN/inf OR out of char range (imp_c)
-    //   "Non displayable" -> printable? no (use std::isprint)
-    //   "'<c>'"           -> printable character
+    //todo: use the helper function in the header file (printChar() ... ), to make the code more readable (opencode)
     std::cout << "char: ";
     if (imp_c)
         std::cout << "impossible";
@@ -247,7 +230,6 @@ void ScalarConverter::convert(const std::string &literal)
         std::cout << "'" << c_val << "'";
     std::cout << "\n";
 
-    // --- INT : impossible or the number itself ---
     std::cout << "int: ";
     if (imp_i)
         std::cout << "impossible";
@@ -255,12 +237,6 @@ void ScalarConverter::convert(const std::string &literal)
         std::cout << i_val;
     std::cout << "\n";
 
-    // --- FLOAT : value + mandatory trailing 'f' ---
-    //   The subject prints "0.0f" and "42.0f", so a whole number must show a
-    //   trailing ".0". We append ".0" when the value has no fractional part
-    //   (f_val == floor(f_val)) AND is not a pseudo-literal (!imp_i).
-    //   Note: for a pseudo-literal, cout prints "nan"/"inf" and imp_i is true,
-    //   so no ".0" is appended -> "nanf"/"inff" as expected.
     std::cout << "float: ";
     if (imp_f)
         std::cout << "impossible";
@@ -273,7 +249,6 @@ void ScalarConverter::convert(const std::string &literal)
     }
     std::cout << "\n";
 
-    // --- DOUBLE : value, same whole-number ".0" rule, no 'f' suffix ---
     std::cout << "double: ";
     if (imp_d)
         std::cout << "impossible";
