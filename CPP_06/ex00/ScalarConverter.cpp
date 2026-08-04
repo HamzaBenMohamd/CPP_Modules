@@ -87,7 +87,7 @@ ScalarConverter::e_literal_type ScalarConverter::detectType(const std::string &l
 	return INT;
 }
 
-//?
+//? prints the char value
 void ScalarConverter::printChar(char c_val, bool imp_c)
 {
     std::cout << "char: ";
@@ -99,7 +99,7 @@ void ScalarConverter::printChar(char c_val, bool imp_c)
         std::cout << "'" << c_val << "'\n";
 }
 
-//?
+//? prints the Int value
 void ScalarConverter::printInt(int i_val, bool imp_i)
 {
     std::cout << "int: ";
@@ -109,7 +109,7 @@ void ScalarConverter::printInt(int i_val, bool imp_i)
         std::cout << i_val << "\n";
 }
 
-//?
+//? prints the Float value
 void ScalarConverter::printFloat(float f_val, bool imp_f, bool imp_i)
 {
     std::cout << "float: ";
@@ -124,7 +124,7 @@ void ScalarConverter::printFloat(float f_val, bool imp_f, bool imp_i)
     }
 }
 
-//?
+//? prints the Double value
 void ScalarConverter::printDouble(double d_val, bool imp_d, bool imp_i)
 {
     std::cout << "double: ";
@@ -140,7 +140,7 @@ void ScalarConverter::printDouble(double d_val, bool imp_d, bool imp_i)
 }
 
 //? convert literal to its type (if it's possible)
-void ScalarConverter::convert(const std::string &literal) //todo test edge cases and make sure this fun is perfect! and meet the correction sheet and the subject's requirements + call someone to test it
+void ScalarConverter::convert(const std::string &literal) //todo call mhoussas to test it
 {
     e_literal_type type = ScalarConverter::detectType(literal);
 
