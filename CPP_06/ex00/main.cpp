@@ -2,6 +2,12 @@
 
 int main(int argc, char const *argv[])
 {
-    
-    return 0;
+	if (argc != 2)
+	{
+		std::cout << "usage: ./convert <literal>" << '\n';
+		return 1;
+	}
+
+	ScalarConverter::convert(argv[1]);
+	return 0;
 }
