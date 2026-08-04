@@ -1,30 +1,30 @@
 #include "RobotomyRequestForm.hpp"
 
-//? Default Constructor
+// Default Constructor
 RobotomyRequestForm::RobotomyRequestForm() : AForm("RobotomyRequestForm", 72, 45), _target("RobotomyRequestForm")
 {
     std::cout << "Default Constructor called of RobotomyRequestForm" << std::endl;
 }
 
-//? Parameterized Constructor
+// Parameterized Constructor
 RobotomyRequestForm::RobotomyRequestForm(std::string target) : AForm("RobotomyRequestForm", 72, 45), _target(target)
 {
     std::cout << "Parameterized Constructor called of RobotomyRequestForm" << std::endl;
 }
 
-//? Copy Constructor
+// Copy Constructor
 RobotomyRequestForm::RobotomyRequestForm(const RobotomyRequestForm &copy) : AForm(copy), _target(copy._target)
 {
     std::cout << "Copy Constructor called of RobotomyRequestForm" << std::endl;
 }
 
-//? Destructor
+// Destructor
 RobotomyRequestForm::~RobotomyRequestForm()
 {
     std::cout << "Destructor called of RobotomyRequestForm" << std::endl;
 }
 
-//? Copy Assignment Operator
+// Copy Assignment Operator
 RobotomyRequestForm &RobotomyRequestForm::operator=(const RobotomyRequestForm &assign)
 {
     std::cout << "Copy Assignment Operator called of RobotomyRequestForm" << std::endl;
@@ -36,7 +36,7 @@ RobotomyRequestForm &RobotomyRequestForm::operator=(const RobotomyRequestForm &a
     return (*this);
 }
 
-//? Executes the robotomy request action
+// Executes the robotomy request action
 void RobotomyRequestForm::execute(Bureaucrat const & executor) const
 {
     if (!getSigned())

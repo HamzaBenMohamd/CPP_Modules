@@ -60,11 +60,13 @@ const char *Bureaucrat::GradeTooLowException::what() const throw()
 
 //! --- getters ---
 
+//?
 const std::string& Bureaucrat::getName() const
 {
 	return this->_name;
 }
 
+//?
 int Bureaucrat::getGrade() const
 {
 	return this->_grade;
@@ -72,6 +74,7 @@ int Bureaucrat::getGrade() const
 
 //! --- Action Methods ---
 
+//?
 void Bureaucrat::incrementGrade()
 {
 	if (this->_grade <= 1)
@@ -79,6 +82,7 @@ void Bureaucrat::incrementGrade()
 	this->_grade--;
 }
 
+//?
 void Bureaucrat::decrementGrade()
 {
 	if (this->_grade >= 150)
@@ -86,6 +90,7 @@ void Bureaucrat::decrementGrade()
 	this->_grade++;
 }
 
+//?
 std::ostream &operator<<(std::ostream &out, const Bureaucrat &bureaucrat)
 {
 	out << bureaucrat.getName() << ", bureaucrat grade " << bureaucrat.getGrade() << '.' << '\n';

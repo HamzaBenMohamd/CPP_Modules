@@ -1,30 +1,30 @@
 #include "ShrubberyCreationForm.hpp"
 
-//? Default Constructor
+// Default Constructor
 ShrubberyCreationForm::ShrubberyCreationForm() : AForm("ShrubberyCreationForm", 145, 137), _target("ShrubberyCreationForm")
 {
     std::cout << "Default Constructor called of ShrubberyCreationForm" << std::endl;
 }
 
-//? Parameterized Constructor
+// Parameterized Constructor
 ShrubberyCreationForm::ShrubberyCreationForm(std::string target) : AForm("ShrubberyCreationForm", 145, 137), _target(target)
 {
     std::cout << "Parameterized Constructor called of ShrubberyCreationForm" << std::endl;
 }
 
-//? Copy Constructor
+// Copy Constructor
 ShrubberyCreationForm::ShrubberyCreationForm(const ShrubberyCreationForm &copy) : AForm(copy), _target(copy._target)
 {
     std::cout << "Copy Constructor called of ShrubberyCreationForm" << std::endl;
 }
 
-//? Destructor
+// Destructor
 ShrubberyCreationForm::~ShrubberyCreationForm()
 {
     std::cout << "Destructor called of ShrubberyCreationForm" << std::endl;
 }
 
-//? Copy Assignment Operator
+// Copy Assignment Operator
 ShrubberyCreationForm &ShrubberyCreationForm::operator=(const ShrubberyCreationForm &assign)
 {
     std::cout << "Copy Assignment Operator called of ShrubberyCreationForm" << std::endl;
@@ -36,7 +36,7 @@ ShrubberyCreationForm &ShrubberyCreationForm::operator=(const ShrubberyCreationF
     return (*this);
 }
 
-//? Executes the shrubbery creation action
+// Executes the shrubbery creation action
 void ShrubberyCreationForm::execute(Bureaucrat const & executor) const
 {
     if (!getSigned())
