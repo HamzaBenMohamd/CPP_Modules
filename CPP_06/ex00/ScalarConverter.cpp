@@ -140,7 +140,7 @@ void ScalarConverter::printDouble(double d_val, bool imp_d, bool imp_i)
 }
 
 //? convert literal to its type (if it's possible)
-void ScalarConverter::convert(const std::string &literal) //todo test edge cases and make sure this fun is perfect! and meet the correction sheet and the subject's requirements
+void ScalarConverter::convert(const std::string &literal) //todo test edge cases and make sure this fun is perfect! and meet the correction sheet and the subject's requirements + call someone to test it
 {
     e_literal_type type = ScalarConverter::detectType(literal);
 
@@ -198,7 +198,6 @@ void ScalarConverter::convert(const std::string &literal) //todo test edge cases
         {
             char *endptr;
             errno = 0;
-            
             double temp_double = std::strtod(literal.c_str(), &endptr);
 
             if (literal == "nanf" || literal == "-inff" || literal == "+inff")
