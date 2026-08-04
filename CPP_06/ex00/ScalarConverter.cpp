@@ -87,8 +87,60 @@ ScalarConverter::e_literal_type ScalarConverter::detectType(const std::string &l
 	return INT;
 }
 
+//?
+void ScalarConverter::printChar(char c_val, bool imp_c)
+{
+    std::cout << "char: ";
+    if (imp_c)
+        std::cout << "impossible\n";
+    else if (!std::isprint(static_cast<unsigned char>(c_val)))
+        std::cout << "Non displayable\n";
+    else
+        std::cout << "'" << c_val << "'\n";
+}
+
+//?
+void ScalarConverter::printInt(int i_val, bool imp_i)
+{
+    std::cout << "int: ";
+    if (imp_i)
+        std::cout << "impossible\n";
+    else
+        std::cout << i_val << "\n";
+}
+
+//?
+void ScalarConverter::printFloat(float f_val, bool imp_f, bool imp_i)
+{
+    std::cout << "float: ";
+    if (imp_f)
+        std::cout << "impossible\n";
+    else
+    {
+        std::cout << f_val;
+        if (f_val == std::floor(f_val) && !imp_i)
+            std::cout << ".0";
+        std::cout << "f\n";
+    }
+}
+
+//?
+void ScalarConverter::printDouble(double d_val, bool imp_d, bool imp_i)
+{
+    std::cout << "double: ";
+    if (imp_d)
+        std::cout << "impossible\n";
+    else
+    {
+        std::cout << d_val;
+        if (d_val == std::floor(d_val) && !imp_i)
+            std::cout << ".0";
+        std::cout << "\n";
+    }
+}
+
 //? convert literal to its type (if it's possible)
-void ScalarConverter::convert(const std::string &literal) //todo test edge cases and make sure this fun is perfect! and meet the correction sheet and the subject's requirements (asigne this task to opencode)
+void ScalarConverter::convert(const std::string &literal) //todo test edge cases and make sure this fun is perfect! and meet the correction sheet and the subject's requirements
 {
     e_literal_type type = ScalarConverter::detectType(literal);
 
@@ -220,43 +272,8 @@ void ScalarConverter::convert(const std::string &literal) //todo test edge cases
             break;
     }
 
-    //todo: use the helper function in the header file (printChar() ... ), to make the code more readable (opencode)
-    std::cout << "char: ";
-    if (imp_c)
-        std::cout << "impossible";
-    else if (!std::isprint(static_cast<unsigned char>(c_val)))
-        std::cout << "Non displayable";
-    else
-        std::cout << "'" << c_val << "'";
-    std::cout << "\n";
-
-    std::cout << "int: ";
-    if (imp_i)
-        std::cout << "impossible";
-    else
-        std::cout << i_val;
-    std::cout << "\n";
-
-    std::cout << "float: ";
-    if (imp_f)
-        std::cout << "impossible";
-    else
-    {
-        std::cout << f_val;
-        if (f_val == std::floor(f_val) && !imp_i)
-            std::cout << ".0";
-        std::cout << "f";
-    }
-    std::cout << "\n";
-
-    std::cout << "double: ";
-    if (imp_d)
-        std::cout << "impossible";
-    else
-    {
-        std::cout << d_val;
-        if (d_val == std::floor(d_val) && !imp_i)
-            std::cout << ".0";
-    }
-    std::cout << "\n";
+    printChar(c_val, imp_c);
+    printInt(i_val, imp_i);
+    printFloat(f_val, imp_f, imp_i);
+    printDouble(d_val, imp_d, imp_i);
 }
