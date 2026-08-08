@@ -1,0 +1,52 @@
+----- Prerequisites -----
+The code must compile with c++ and the flags -Wall -Wextra -Werror
+Don't forget this project has to follow the C++98 standard. Thus,
+C++11 (and later) functions or containers are NOT expected.
+
+Any of these means you must not grade the exercise in question:
+
+* A function is implemented in a header file (except for template functions).
+* A Makefile compiles without the required flags and/or another compiler than c++.
+
+Any of these means that you must flag the project with "Forbidden
+Function":
+
+* Use of a "C" function (*alloc, *printf, free).
+* Use of a function not allowed in the exercise guidelines.
+* Use of "using namespace <ns_name>" or the "friend" keyword.
+* Use of an external library, or features from versions other than C++98.
+
+----- Exercise 00: Start with a few functions -----
+
+This exercise is about writing 3 simple function templates: swap(), min() and max().
+Refer to the subject for the expected output with simple types, such
+as int.
+Do the functions also work with complex types? (check with the ex00.cpp file in attachment)
+
+----- Exercise 01: Iter -----
+
+This exercise is about writing a generic function to iterate through arrays.
+Test the code ex01.cpp (in attachments) with the iter of the evaluated student.
+If everything went well, it should display:
+
+0
+1
+2
+3
+4
+42
+42
+42
+42
+42
+
+----- Exercise 02: Array -----
+
+This exercise is about writing a class template that behaves like an array.
+If the inner allocation of the actual array does not come from a use of new[], don't grade this exercise.
+Ask the evaluated student to prove the class template works with arrays of both simple and complex types before grading the exercise.
+Is it possible to create an empty array and an array of a specific size?
+Elements must be accessible for reading and writing through the operator[]
+(or reading only if the instance is const). Access to an element which is
+out of range must throw an std::exception.
+
