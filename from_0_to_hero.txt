@@ -6,7 +6,7 @@ The problem: you open a new module, you stare at the subject, you get lost,
 you re-read it 10 times, you waste hours, then you finally figure out the
 structure and realize you always follow the SAME path.
 
-Solution: follow this checklist EVERY day. Print it, memorize it, use it.
+Solution: follow this checklist EVERY day.
 Don't start coding before step 4. Step 4 is the one that saves you.
 
 ------------------------------------------------------------------------------
@@ -50,7 +50,6 @@ The subject never says "today you learn X". You must deduce X from:
    - The "Forbidden" hints (ex02 forbids typeinfo -> dynamic_cast is the answer).
    - The class/function names (Serializer + uintptr_t -> reinterpret_cast).
 Before writing ANY code, list the concepts:
-   - Module 06: static_cast, dynamic_cast, reinterpret_cast, const_cast.
    - If you can't name the concepts, READ about them first.
    Spend 20-40 min studying with cppreference BEFORE coding.
    OUTPUT DELIVERABLE: a short list of concepts per exercise + 1-2 lines
