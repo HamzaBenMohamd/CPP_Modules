@@ -8,6 +8,11 @@ class Pair
     T2 second;
 
   public:
+    Pair()
+    {
+      this->first = 10;
+      this->second = 20;
+    }
     Pair(T1 a, T2 b)
     {
       this->first = a;
@@ -21,10 +26,11 @@ class Pair
 
 int main()
 {
-  Pair person("John", 30);  // same as: Pair<string, int> person("John", 30);
-  Pair score(51, 9.5); // same as: Pair<int, double> score(51, 9.5);
+  // this line will not work because it dones not know the datatype the attributes of the class will have!
+  // Pair anonymos;
+  // that's why you should specify the datatypes in the declaration like this:
+  Pair<int, int> anonymos;
+  anonymos.display();
 
-  person.display();
-  score.display();
   return 0;
 }
