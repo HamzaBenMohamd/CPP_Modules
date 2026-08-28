@@ -1,0 +1,60 @@
+------ Prerequisites ------
+The code must compile with c++ and the flags -Wall -Wextra -Werror
+Don't forget this project has to follow the C++98 standard. Thus,
+C++11 (and later) are NOT expected.
+The purpose of this module is to use the STL. Then, using the
+containers and the algorithms is authorized.
+
+Any of these means you must not grade the exercise in question:
+
+* A function is implemented in a header file (except for template functions).
+* A Makefile compiles without the required flags and/or another compiler than c++.
+
+Any of these means that you must flag the project with "Forbidden
+Function":
+
+* Use of a "C" function (*alloc, *printf, free).
+* Use of a function not allowed in the exercise guidelines.
+* Use of "using namespace <ns_name>" or the "friend" keyword.
+* Use of an external library, or features from versions other than C++98.
+
+------ Exercise 00: Easy find ------
+As usual, there has to be enough tests to prove the program works as expected.
+If there isn't, do not grade this exercise.
+If any non-interface class is not in orthodox canonical class form, do not grade this exercise.
+
+Template function
+There is a templated function easyfind(T, int) that does what the
+subject requires.
+It HAS to use STL algorithms.
+If it does not use them count it as wrong. (For example: a manual
+search using iterators)
+
+------ Exercise 01: Span ------
+As usual, there has to be enough tests to prove the program works as expected.
+If there isn't, do not grade this exercise.
+If any non-interface class is not in orthodox canonical class form, do not grade this exercise.
+
+Class and member functions
+There is a class that complies with the requirements of the subject.
+Its member functions use STL algorithms to find their result as much as
+possible. Finding the shortest span can't be done only by subtracting
+the two lowest numbers (take a closer look at the subject example).
+
+Improved addNumber function
+There's a way to add numbers that's more practical than calling the
+addNumber() function repeatedly.
+
+------ Exercise 02: Mutated abomination ------
+As usual, there has to be enough tests to prove the program works as expected.
+If there isn't, do not grade this exercise.
+If any non-interface class is not in orthodox canonical class form, do not grade this exercise.
+
+MutantStack class
+There is a MutantStack class that offers all of std::stack methods.
+It must contain an iterator.
+Also, it is possible to do at least the operations shown in the subject's examples using iterators.
+
+Better tests
+There is a at least a main() function that has more tests than the ones
+from the subject.
