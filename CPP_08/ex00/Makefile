@@ -3,7 +3,7 @@ NAME = easyfind
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRCS = main.cpp
+SRCS = main.cpp NotFoundException.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)
@@ -11,7 +11,7 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
 
-%.o: %.cpp easyfind.hpp easyfind.tpp Makefile
+%.o: %.cpp easyfind.hpp NotFoundException.hpp Makefile
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
