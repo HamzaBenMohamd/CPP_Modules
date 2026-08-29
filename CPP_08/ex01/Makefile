@@ -3,7 +3,7 @@ NAME = span
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRCS = main.cpp Span.cpp
+SRCS = main.cpp Span.cpp SpanExceptions.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)
@@ -11,7 +11,7 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
 
-%.o: %.cpp Span.hpp Makefile
+%.o: %.cpp Span.hpp SpanExceptions.hpp Makefile
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
