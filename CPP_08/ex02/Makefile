@@ -11,7 +11,7 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
 
-%.o: %.cpp MutantStack.hpp MutantStack.tpp Makefile
+%.o: %.cpp MutantStack.hpp Makefile
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
