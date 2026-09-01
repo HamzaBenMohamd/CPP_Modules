@@ -10,3 +10,5 @@ class NotFoundException : public std::exception
 };
 
 #endif
+
+//! => If any non-interface class is not in orthodox canonical class form, do not grade this exercise.
