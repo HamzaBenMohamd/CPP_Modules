@@ -1,0 +1,21 @@
+Files
+BitcoinExchange.hpp — The class declaration with the container choice and public interface.
+- Uses std::map<std::string, float> to store date → exchange rate. A map keeps keys sorted, which is exactly what we need for "nearest lower date" lookups via lower_bound().
+BitcoinExchange.cpp — The implementation, split into logical blocks:
+- Canonical Form (constructor/copy/assignment/destructor) — required by the module rules.
+- loadDatabase() — reads data.csv line by line, skips the header, validates each date/rate, and fills the map. Malformed lines are skipped so the rest of the DB still loads.
+- processFile() — reads the input file. For each line it: splits on " | ", skips the header silently, rejects invalid dates, rejects dates before the earliest DB entry (2009-01-02), and checks that the value is a non-negative number ≤ 1000. It never stops on the first error — the whole file is processed (a correction-sheet requirement).
+- parseDate() — splits a line around the " | " separator.
+- isValidDate() — validates the YYYY-MM-DD format with real calendar logic (month ranges, days-per-month, leap-year handling for Feb 29).
+- getRate() — the "nearest lower date" logic: lower_bound() finds the first key >= date; stepping back one position gives the closest strictly-lower date.
+main.cpp — checks the CLI arg count, loads the DB, processes the file, and catches exceptions.
+Edge cases handled
+- Empty/missing file → Error: could not open file.
+- Negative value → Error: not a positive number.
+- Value > 1000 → Error: too large a number.
+- Invalid separator, malformed value, non-numeric → Error: bad input => ...
+- Invalid calendar dates (Feb 30, month 13, day 0, day 32) → rejected; real leap days (2016-02-29) → accepted
+- Dates before the DB's start → rejected; missing dates → resolved to nearest lower date
+- Whole file always processed despite errors (no early exit)
+The comments in the code walk through each section, including the map/lower_bound reasoning and the leap-year math, so you can explain it during the correction.
+
