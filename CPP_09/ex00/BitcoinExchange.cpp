@@ -1,56 +1,29 @@
 #include "BitcoinExchange.hpp"
 
-#include <cctype>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
-/*
-** ---------------------------------------------------------------------------
-** Canonical Form
-** ---------------------------------------------------------------------------
-** These special member functions give the class the "Orthodox Canonical Form"
-** required by the module. The map member is copied automatically by the
-** compiler-generated copy operations, but we still define them explicitly.
-** ---------------------------------------------------------------------------
-*/
 BitcoinExchange::BitcoinExchange() {}
 
-BitcoinExchange::BitcoinExchange(const BitcoinExchange& other)
-    : _rates(other._rates)
-{
-}
+BitcoinExchange::BitcoinExchange(const BitcoinExchange& other) : _rates(other._rates) {}
 
-BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other)
+BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other)
 {
     if (this != &other)
-        this->_rates = other._rates;
+        _rates = other._rates;
     return *this;
 }
 
 BitcoinExchange::~BitcoinExchange() {}
 
-/*
-** ---------------------------------------------------------------------------
-** loadDatabase
-** ---------------------------------------------------------------------------
-** Reads the CSV file (format: "date,exchange_rate") and fills the map.
-** The first line is a header and is skipped. Any malformed line is skipped
-** so the rest of the database can still be loaded.
-** ---------------------------------------------------------------------------
-*/
-void BitcoinExchange::loadDatabase(const std::string& dbFile)
+//? Loads the CSV database into the map. Throws on failure.
+void BitcoinExchange::loadDatabase(const std::string &dbFile)
 {
     std::ifstream file(dbFile.c_str());
     if (!file.is_open())
-        throw std::runtime_error("Error: could not open file.");
+        throw std::runtime_error("Error: could not open file .");
 
     std::string line;
     bool first = true;
     while (std::getline(file, line))
     {
-        // Skip the header line ("date,exchange_rate").
         if (first)
         {
             first = false;
@@ -95,12 +68,13 @@ void BitcoinExchange::loadDatabase(const std::string& dbFile)
 ** first error: the whole file is always processed.
 ** ---------------------------------------------------------------------------
 */
+//? Processes a whole input file, printing each result or an error.
 void BitcoinExchange::processFile(const std::string& inputFile) const
 {
     std::ifstream file(inputFile.c_str());
     if (!file.is_open())
     {
-        std::cerr << "Error: could not open file." << std::endl;
+        std::cout << "Error: could not open file." << std::endl;
         return;
     }
 
@@ -121,20 +95,20 @@ void BitcoinExchange::processFile(const std::string& inputFile) const
         // Validate the date part (format + real calendar date).
         if (ret != 0 || !isValidDate(date))
         {
-            std::cerr << "Error: bad input => " << line << std::endl;
+            std::cout << "Error: bad input => " << line << std::endl;
             continue;
         }
         if (date < MIN_DATE)
         {
             // No database entry exists at or before this date.
-            std::cerr << "Error: bad input => " << line << std::endl;
+            std::cout << "Error: bad input => " << line << std::endl;
             continue;
         }
 
         // Validate the value: must be a float or positive integer, >= 0.
         if (valueStr.find('-') != std::string::npos)
         {
-            std::cerr << "Error: not a positive number." << std::endl;
+            std::cout << "Error: not a positive number." << std::endl;
             continue;
         }
 
@@ -143,19 +117,19 @@ void BitcoinExchange::processFile(const std::string& inputFile) const
         // Reject if nothing was parsed, trailing junk, or a non-number.
         if (end == valueStr.c_str() || *end != '\0' || !std::isdigit(valueStr[0]))
         {
-            std::cerr << "Error: bad input => " << line << std::endl;
+            std::cout << "Error: bad input => " << line << std::endl;
             continue;
         }
 
         // Value must be between 0 and 1000 inclusive.
         if (value < 0)
         {
-            std::cerr << "Error: not a positive number." << std::endl;
+            std::cout << "Error: not a positive number." << std::endl;
             continue;
         }
         if (value > 1000)
         {
-            std::cerr << "Error: too large a number." << std::endl;
+            std::cout << "Error: too large a number." << std::endl;
             continue;
         }
 
@@ -180,6 +154,7 @@ void BitcoinExchange::processFile(const std::string& inputFile) const
 **   - day between 01 and 28/29/30/31 depending on the month and leap years.
 ** ---------------------------------------------------------------------------
 */
+//? Parses "date | value" style lines.
 int BitcoinExchange::parseDate(const std::string& line, std::string& date,
                                std::string& value)
 {
@@ -198,6 +173,7 @@ int BitcoinExchange::parseDate(const std::string& line, std::string& date,
     return 0;
 }
 
+//? Validates that a date string is a real YYYY-MM-DD calendar date.
 bool BitcoinExchange::isValidDate(const std::string& date)
 {
     // Must be exactly "YYYY-MM-DD" -> 10 characters.
@@ -212,7 +188,7 @@ bool BitcoinExchange::isValidDate(const std::string& date)
             if (date[i] != '-')
                 return false;
         }
-        else if (!std::isdigit(date[i]))
+        else if (std::isdigit(static_cast<unsigned char>(date[i])))
             return false;
     }
 
@@ -251,6 +227,7 @@ bool BitcoinExchange::isValidDate(const std::string& date)
 ** step back one position to get the nearest strictly-lower date.
 ** ---------------------------------------------------------------------------
 */
+//? Returns the rate for the date or the nearest lower one.
 float BitcoinExchange::getRate(const std::string& date) const
 {
     std::map<std::string, float>::const_iterator it = _rates.lower_bound(date);
