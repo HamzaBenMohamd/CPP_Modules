@@ -1,10 +1,21 @@
 #include "BitcoinExchange.hpp"
 
+/*
+** ---------------------------------------------------------------------------
+** Canonical Form
+** ---------------------------------------------------------------------------
+** Orthodox Canonical Form as required by the module. The std::map member is
+** copied automatically by the compiler-generated operations, but we still
+** define them explicitly for clarity.
+** ---------------------------------------------------------------------------
+*/
 BitcoinExchange::BitcoinExchange() {}
 
-BitcoinExchange::BitcoinExchange(const BitcoinExchange& other) : _rates(other._rates) {}
+BitcoinExchange::BitcoinExchange(const BitcoinExchange& other) : _rates(other._rates)
+{
+}
 
-BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other)
+BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other)
 {
     if (this != &other)
         _rates = other._rates;
@@ -13,44 +24,51 @@ BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other)
 
 BitcoinExchange::~BitcoinExchange() {}
 
-//? Loads the CSV database into the map. Throws on failure.
-void BitcoinExchange::loadDatabase(const std::string &dbFile)
+/*
+** ---------------------------------------------------------------------------
+** loadDatabase
+** ---------------------------------------------------------------------------
+** Reads the CSV file (format: "date,exchange_rate") and fills the map.
+**
+** The first line must be the header; every following "date,rate" line is
+** validated (real date + finite non-negative number) and inserted. Lines
+** that fail validation are skipped so the rest of the DB still loads.
+** If nothing can be loaded we throw so the caller reports the failure.
+** ---------------------------------------------------------------------------
+*/
+void BitcoinExchange::loadDatabase(const std::string& dbFile)
 {
     std::ifstream file(dbFile.c_str());
     if (!file.is_open())
-        throw std::runtime_error("Error: could not open file .");
+        throw std::runtime_error("Error: could not open file.");
 
     std::string line;
-    bool first = true;
+    // First line = header; check it matches the expected CSV shape.
+    if (!std::getline(file, line))
+        throw std::runtime_error("Error: empty database file.");
+
+    std::string hLeft, hRight;
+    if (!splitOnChar(line, ',', hLeft, hRight)
+        || trim(hLeft) != "date" || trim(hRight) != "exchange_rate")
+        throw std::runtime_error("Error: malformed database header.");
+
+    // Load the actual data lines.
     while (std::getline(file, line))
     {
-        if (first)
-        {
-            first = false;
-            continue;
-        }
-        // Skip empty lines / whitespace-only lines.
-        if (line.find_first_not_of(" \t\r") == std::string::npos)
+        std::string date, rateStr;
+        if (!splitOnChar(line, ',', date, rateStr))
             continue;
 
-        // The CSV is "date,rate". Split on the first comma.
-        std::string::size_type comma = line.find(',');
-        if (comma == std::string::npos)
+        date = trim(date);
+        rateStr = trim(rateStr);
+
+        double rate;
+        if (!parseDouble(rateStr, rate) || rate < 0)
             continue;
-
-        std::string date = line.substr(0, comma);
-        std::string rateStr = line.substr(comma + 1);
-
-        // Basic sanity checks on the date and rate before inserting.
         if (!isValidDate(date))
             continue;
 
-        std::istringstream iss(rateStr);
-        float rate;
-        if (!(iss >> rate) || rate < 0)
-            continue;
-
-        // insert: a later duplicate simply does not override the first value.
+        // insert: later duplicates keep the first value encountered.
         _rates.insert(std::make_pair(date, rate));
     }
 
@@ -62,13 +80,12 @@ void BitcoinExchange::loadDatabase(const std::string &dbFile)
 ** ---------------------------------------------------------------------------
 ** processFile
 ** ---------------------------------------------------------------------------
-** Reads the input file line by line. Every line must follow
-** "date | value". For each line we either print the computed result
-** or an appropriate error message. The program must NOT stop on the
-** first error: the whole file is always processed.
+** Processes the input file ("date | value" per line) and prints, for each
+** valid line, "date => value = result". Invalid lines print an error but are
+** skipped, and the program always keeps going until the file is exhausted
+** (a correction-sheet requirement).
 ** ---------------------------------------------------------------------------
 */
-//? Processes a whole input file, printing each result or an error.
 void BitcoinExchange::processFile(const std::string& inputFile) const
 {
     std::ifstream file(inputFile.c_str());
@@ -79,50 +96,56 @@ void BitcoinExchange::processFile(const std::string& inputFile) const
     }
 
     std::string line;
+    bool firstLine = true;
     while (std::getline(file, line))
     {
-        // The database has no entry before 2009-01-02, so this is the
-        // earliest date we can ever resolve a rate for.
-        static const std::string MIN_DATE = "2009-01-02";
+        // trim() also removes '\r', so both LF and CRLF files work.
+        std::string trimmed = trim(line);
 
+        // Silent skip of blank/whitespace-only lines.
+        if (trimmed.empty())
+            continue;
+
+        // The first real line must be the header and is skipped silently.
+        if (firstLine)
+        {
+            firstLine = false;
+            if (trimmed != "date | value")
+            {
+                std::cout << "Error: bad input => " << trimmed << std::endl;
+                continue;
+            }
+            continue;
+        }
+
+        // Split around '|', then trim both sides so spacing is irrelevant.
         std::string date, valueStr;
-        int ret = parseDate(line, date, valueStr);
-
-        // The first line "date | value" is a header: skip it silently.
-        if (ret == 0 && date == "date" && valueStr == "value")
-            continue;
-
-        // Validate the date part (format + real calendar date).
-        if (ret != 0 || !isValidDate(date))
+        if (!splitOnChar(trimmed, '|', date, valueStr))
         {
-            std::cout << "Error: bad input => " << line << std::endl;
+            std::cout << "Error: bad input => " << trimmed << std::endl;
             continue;
         }
-        if (date < MIN_DATE)
+        date = trim(date);
+        valueStr = trim(valueStr);
+
+        // The date must be a real YYYY-MM-DD calendar date.
+        if (!isValidDate(date))
         {
-            // No database entry exists at or before this date.
-            std::cout << "Error: bad input => " << line << std::endl;
+            std::cout << "Error: bad input => " << trimmed << std::endl;
             continue;
         }
 
-        // Validate the value: must be a float or positive integer, >= 0.
-        if (valueStr.find('-') != std::string::npos)
+        // The value must parse cleanly as a finite double.
+        double value;
+        if (!parseDouble(valueStr, value))
         {
-            std::cout << "Error: not a positive number." << std::endl;
+            std::cout << "Error: bad input => " << trimmed << std::endl;
             continue;
         }
 
-        char* end = NULL;
-        double value = std::strtod(valueStr.c_str(), &end);
-        // Reject if nothing was parsed, trailing junk, or a non-number.
-        if (end == valueStr.c_str() || *end != '\0' || !std::isdigit(valueStr[0]))
-        {
-            std::cout << "Error: bad input => " << line << std::endl;
-            continue;
-        }
-
-        // Value must be between 0 and 1000 inclusive.
-        if (value < 0)
+        // Value range checks. '-0' still checks value<0 false, so reject any
+        // value whose text starts with a minus (a negative -> not positive).
+        if (value < 0 || valueStr[0] == '-')
         {
             std::cout << "Error: not a positive number." << std::endl;
             continue;
@@ -133,62 +156,119 @@ void BitcoinExchange::processFile(const std::string& inputFile) const
             continue;
         }
 
-        // Looks good: compute value * rate for the given date.
-        float rate = getRate(date);
+        // Resolve the rate (exact date, else nearest lower). getRate fails
+        // if the date is older than every entry in the database.
+        double rate;
+        if (!getRate(date, rate))
+        {
+            std::cout << "Error: no rate available before " << date
+                      << "." << std::endl;
+            continue;
+        }
+
         std::cout << date << " => " << valueStr << " = "
-                  << value * rate << std::endl;
+                  << (value * rate) << std::endl;
     }
 }
 
 /*
 ** ---------------------------------------------------------------------------
-** parseDate and isValidDate
+** trim / splitOnChar
 ** ---------------------------------------------------------------------------
-** parseDate splits a line around the " | " separator. If the separator is
-** missing or the date/value tokens are empty it returns -1.
+** trim strips leading and trailing spaces/tabs/carriage-returns. This is
+** what makes CRLF files and flexible white-space work.
 **
-** isValidDate checks that a string is a valid calendar date (YYYY-MM-DD):
-**   - exactly 10 characters,
-**   - digits and '-' in the right places,
-**   - month between 01 and 12,
-**   - day between 01 and 28/29/30/31 depending on the month and leap years.
+** splitOnChar finds the first 'sep' and splits the line into left/right.
+** It returns false when no separator is present.
 ** ---------------------------------------------------------------------------
 */
-//? Parses "date | value" style lines.
-int BitcoinExchange::parseDate(const std::string& line, std::string& date,
-                               std::string& value)
+std::string BitcoinExchange::trim(const std::string& s)
 {
-    // Locate the " | " separator. strlen(" | ") == 3.
-    std::string::size_type sep = line.find(" | ");
-    if (sep == std::string::npos)
-        return -1;
-
-    date = line.substr(0, sep);
-    value = line.substr(sep + 3);
-
-    // Neither side may be empty.
-    if (date.empty() || value.empty())
-        return -1;
-
-    return 0;
+    std::string::size_type start = s.find_first_not_of(" \t\r");
+    if (start == std::string::npos)
+        return "";
+    std::string::size_type end = s.find_last_not_of(" \t\r");
+    return s.substr(start, end - start + 1);
 }
 
-//? Validates that a date string is a real YYYY-MM-DD calendar date.
-bool BitcoinExchange::isValidDate(const std::string& date)
+bool BitcoinExchange::splitOnChar(const std::string& line, char sep,
+                                  std::string& left, std::string& right)
 {
-    // Must be exactly "YYYY-MM-DD" -> 10 characters.
-    if (date.length() != 10)
+    std::string::size_type pos = line.find(sep);
+    if (pos == std::string::npos)
+        return false;
+    left = line.substr(0, pos);
+    right = line.substr(pos + 1);
+    return true;
+}
+
+/*
+** ---------------------------------------------------------------------------
+** parseDouble
+** ---------------------------------------------------------------------------
+** Robust numeric parser: rejects empty strings, non-parsable input, trailing
+** junk ("1abc") and out-of-range / non-finite results (inf / nan),
+** which strtod alone would silently accept.
+** ---------------------------------------------------------------------------
+*/
+bool BitcoinExchange::parseDouble(const std::string& s, double& out)
+{
+    if (s.empty())
         return false;
 
-    // Digits and dashes must be at the expected positions.
-    for (int i = 0; i < 10; ++i)
+    const char* cstr = s.c_str();
+    char* end = NULL;
+    errno = 0;
+    double value = std::strtod(cstr, &end);
+
+    if (end == cstr)            // nothing was parsed
+        return false;
+    if (*end != '\0')           // trailing junk remains
+        return false;
+    if (errno == ERANGE)        // overflow / underflow
+        return false;
+    if (!std::isfinite(value))  // inf / -inf / nan
+        return false;
+
+    out = value;
+    return true;
+}
+
+/*
+** ---------------------------------------------------------------------------
+** isValidDate / isLeapYear
+** ---------------------------------------------------------------------------
+** isValidDate verifies a strict "YYYY-MM-DD" string and checks it encodes a
+** real calendar date: month 1..12 and day within the correct number of days
+** for that month/year (leap years give February 29 days).
+** ---------------------------------------------------------------------------
+*/
+bool BitcoinExchange::isLeapYear(int year)
+{
+    if (year % 400 == 0)
+        return true;
+    if (year % 100 == 0)
+        return false;
+    return (year % 4 == 0);
+}
+
+bool BitcoinExchange::isValidDate(const std::string& date)
+{
+    if (date.size() != 10)
+        return false;
+
+    static const int days[12] = {31, 28, 31, 30, 31, 30,
+                                 31, 31, 30, 31, 30, 31};
+
+    // digits and '-' must sit at the right positions.
+    for (std::string::size_type i = 0; i < date.size(); ++i)
     {
         if (i == 4 || i == 7)
         {
             if (date[i] != '-')
                 return false;
         }
-        else if (std::isdigit(static_cast<unsigned char>(date[i])))
+        else if (!std::isdigit(static_cast<unsigned char>(date[i])))
             return false;
     }
 
@@ -196,18 +276,11 @@ bool BitcoinExchange::isValidDate(const std::string& date)
     int month = std::atoi(date.substr(5, 2).c_str());
     int day   = std::atoi(date.substr(8, 2).c_str());
 
-    // Month must be 1..12.
     if (month < 1 || month > 12)
         return false;
 
-    // Days per month for a non-leap year.
-    static const int daysInMonth[] = {31, 28, 31, 30, 31, 30,
-                                      31, 31, 30, 31, 30, 31};
-    int maxDay = daysInMonth[month - 1];
-
-    // February has 29 days on leap years.
-    bool leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-    if (month == 2 && leap)
+    int maxDay = days[month - 1];
+    if (month == 2 && isLeapYear(year))
         maxDay = 29;
 
     return day >= 1 && day <= maxDay;
@@ -217,32 +290,33 @@ bool BitcoinExchange::isValidDate(const std::string& date)
 ** ---------------------------------------------------------------------------
 ** getRate
 ** ---------------------------------------------------------------------------
-** Returns the rate stored for the exact date if it exists; otherwise it
-** returns the rate of the closest date that is LOWER than the requested
-** date (never a higher one, as the subject requires).
+** Returns the rate for the exact date if present; otherwise the rate of the
+** closest date that is strictly LOWER than the requested date (never a
+** higher one, per the subject). Returns false when no date at or before the
+** requested one exists in the database.
 **
-** This works because std::map keeps keys sorted. lower_bound(key) returns an
-** iterator to the first element whose key is >= key. If it points past the
-** end then every date is lower -> we take the last element. Otherwise we
-** step back one position to get the nearest strictly-lower date.
+** std::map keys are sorted, so lower_bound(date) yields the first entry
+** whose key >= date. Stepping back one position gives the nearest lower
+** date.
 ** ---------------------------------------------------------------------------
 */
-//? Returns the rate for the date or the nearest lower one.
-float BitcoinExchange::getRate(const std::string& date) const
+bool BitcoinExchange::getRate(const std::string& date, double& rate) const
 {
-    std::map<std::string, float>::const_iterator it = _rates.lower_bound(date);
+    std::map<std::string, double>::const_iterator it = _rates.lower_bound(date);
 
-    // Every stored date is older than the requested one -> take the newest one.
-    if (it == _rates.end())
-        return _rates.rbegin()->second;
+    // Exact match -> use directly.
+    if (it != _rates.end() && it->first == date)
+    {
+        rate = it->second;
+        return true;
+    }
 
-    // Exact match -> use it directly.
-    if (it->first == date)
-        return it->second;
-
-    // Otherwise use the previous (nearest lower) date.
+    // Nothing at or before this date in the DB -> report failure.
     if (it == _rates.begin())
-        return 0.0f;    // Should not happen because of the MIN_DATE check.
+        return false;
+
+    // Step back to the nearest date that is lower.
     --it;
-    return it->second;
+    rate = it->second;
+    return true;
 }
