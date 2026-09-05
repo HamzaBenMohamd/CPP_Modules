@@ -132,7 +132,6 @@ $>
 Warning: The container(s) you use to validate this exercise will no
 longer be usable for the rest of this module.
 
-Chapter VI
 ---- Exercise 01: Reverse Polish Notation ----
 Exercise: 01
 RPN
