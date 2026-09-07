@@ -6,8 +6,9 @@
 # include <stack>
 # include <stdexcept>
 # include <climits>
+# include <cctype>
 
-class RPN 
+class RPN
 {
     private:
         std::stack<int> _stack;
