@@ -1,12 +1,12 @@
 #include "RPN.hpp"
 
-//? 
+//? Default Constructor
 RPN::RPN() {}
 
-//? 
+//? Copy Constructor
 RPN::RPN(const RPN &other) : _stack(other._stack) {}
 
-//?
+//? Assignment Operator
 RPN &RPN::operator=(const RPN &other)
 {
     if (this != &other) 
@@ -14,43 +14,28 @@ RPN &RPN::operator=(const RPN &other)
     return *this;
 }
 
-//?
+//? Destructor
 RPN::~RPN() {}
 
-//? 
+//? calculate the operation (ex: 8 4 /)
 void RPN::calculate(const std::string &expression)
 {
-    for (size_t i = 0; i < expression.length(); ++i) // i = 5
+    for (size_t i = 0; i < expression.length(); ++i)
     {
         char c = expression[i];
-
-        // 1. Skip spaces safely
-        if (c == ' ')
+        if (std::isspace(static_cast<unsigned char>(c)))
             continue;
 
-        // 2. Identify single digit numbers and push them
-        if (std::isdigit(c))
-        {
-            // Convert the ASCII character to its actual integer value
+        if (std::isdigit(static_cast<unsigned char>(c)))
             _stack.push(c - '0');
-        }
-        // 3. Identify operators and trigger calculation
         else if (isOperator(c))
-        {
             performOperation(c);
-        }
-        // 4. Reject any foreign characters (letters, decimals, brackets)
         else
-        {
             throw std::runtime_error("Error");
-        }
     }
-
-    // After evaluating the entire string, exactly one number must remain
     if (_stack.size() != 1)
         throw std::runtime_error("Error");
 
-    // Print the final result
     std::cout << _stack.top() << '\n';
 }
 
@@ -63,20 +48,14 @@ bool RPN::isOperator(char c) const
 //? perform one operation (+ - * /)
 void RPN::performOperation(char op)
 {
-    // 1. Validate stack size
     if (_stack.size() < 2)
         throw std::runtime_error("Error");
 
-    // 2. Extract operands (Order matters heavily here)
-    int rhs = _stack.top(); // Right-hand side
+    int rhs = _stack.top();
     _stack.pop();
-    
-    int lhs = _stack.top(); // Left-hand side
+    int lhs = _stack.top();
     _stack.pop();
-
     long result = 0;
-
-    // 3. Execute the specific math operation
     switch (op)
     {
         case '+':
@@ -89,13 +68,13 @@ void RPN::performOperation(char op)
             result = static_cast<long>(lhs) * rhs;
             break;
         case '/':
-            // Protect against division by zero
             if (rhs == 0)
                 throw std::runtime_error("Error");
             result = static_cast<long>(lhs) / rhs;
             break;
     }
+	if (result > INT_MAX || result < INT_MIN)
+	        throw std::runtime_error("Error");
 
-    // 4. Push the calculated result back to be used by the next operator
     _stack.push(static_cast<int>(result));
 }
