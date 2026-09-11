@@ -7,47 +7,40 @@
 # include <string>
 # include <stdexcept>
 # include <cstdlib>
-# include <sys/time.h> // Required for microsecond timing
+# include <sys/time.h>
 # include <climits>
-
-# include <algorithm> // For std::sort and std::lower_bound
-# include <utility>   // For std::pair
+# include <algorithm>
+# include <utility>
 
 class PmergeMe
 {
     private:
-        std::vector<int> _vector;
-        std::deque<int>  _deque;
+        std::vector<int>	_vector;
+        std::deque<int>		_deque;
 
-        // Core workflow helpers
-        void parseInput(int argc, char** argv);
-        
+        void parseInput(int argc, char **argv);
 		long calculateTimeDiff(const struct timeval& start, const struct timeval& end) const;
-
 		void mergeInsertSortVector(std::vector<int> &arr);
-		
-        // Ford-Johnson Algorithm implementations
+
         void sortVector();
         void sortDeque();
 
-        // Template helper to print either container cleanly
         template <typename Container>
         void printContainer(const std::string& prefix, const Container& c) const;
 
     public:
-        // Orthodox Canonical Form
+        //* OCF
         PmergeMe();
         PmergeMe(const PmergeMe& other);
         PmergeMe& operator=(const PmergeMe& other);
         ~PmergeMe();
 
-        // Main execution entry point
-        void process(int argc, char** argv);
+        void process(int argc, char **argv);
 };
 
-// C++98 requires template definitions to be in the header file
+//* print container
 template <typename Container>
-void PmergeMe::printContainer(const std::string& prefix, const Container& c) const
+void PmergeMe::printContainer(const std::string &prefix, const Container &c) const
 {
     std::cout << prefix;
     typename Container::const_iterator it;
