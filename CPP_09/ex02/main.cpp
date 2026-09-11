@@ -9,12 +9,12 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	try 
+	try
 	{
 		PmergeMe sorter;
 		sorter.process(argc, argv);
-	} 
-	catch (const std::exception& e) 
+	}
+	catch (const std::exception& e)
 	{
 		// Catches bad inputs like negative numbers or alphabetical characters
 		std::cerr << "Error: " << e.what() << '\n';
