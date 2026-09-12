@@ -76,9 +76,6 @@ void PmergeMe::process(int argc, char **argv)
     std::cout << "Time to process a range of " << _deque.size() << " elements with std::deque  : " << timeDeque << " us\n";
 }
 
-//todo: Stub sorting methods (To be implemented)
-void PmergeMe::sortDeque() {}
-
 //* Sort Vector
 void PmergeMe::sortVector()
 {
@@ -231,4 +228,119 @@ void PmergeMe::mergeInsertSortVector(std::vector<int> &arr) //* 8 3 1 7 0 10 2 5
     }
     // The original array is now fully sorted.
     arr = mainChain;
+}
+
+void PmergeMe::sortDeque()
+{
+    mergeInsertSortDeque(_deque);
+}
+
+void PmergeMe::mergeInsertSortDeque(std::deque<int> &arr)
+{
+    if (arr.size() < 2)
+        return;
+
+    bool hasStraggler = (arr.size() % 2 != 0);
+    int straggler = 0;
+    if (hasStraggler)
+    {
+        straggler = arr.back();
+        arr.pop_back();
+    }
+
+    std::deque< std::pair<int, int> > pairs;
+    for (size_t i = 0; i < arr.size(); i += 2)
+    {
+        if (arr[i] < arr[i + 1])
+            pairs.push_back(std::make_pair(arr[i], arr[i + 1]));
+        else
+            pairs.push_back(std::make_pair(arr[i + 1], arr[i]));
+    }
+
+    std::deque<int> mainChain;
+    for (size_t i = 0; i < pairs.size(); ++i)
+    {
+        mainChain.push_back(pairs[i].second);
+    }
+
+    mergeInsertSortDeque(mainChain);
+
+    std::deque<int> pend;
+    for (size_t i = 0; i < mainChain.size(); ++i)
+    {
+        for (size_t j = 0; j < pairs.size(); ++j)
+        {
+            if (pairs[j].second == mainChain[i])
+            {
+                pend.push_back(pairs[j].first);
+                pairs[j].second = -1;
+                break;
+            }
+        }
+    }
+
+    if (hasStraggler)
+    {
+        pend.push_back(straggler);
+    }
+
+	std::deque<int> originalMainChain = mainChain;
+
+    if (!pend.empty())
+    {
+        mainChain.insert(mainChain.begin(), pend[0]);
+    }
+    std::deque<size_t> jacobSequence;
+    size_t prev = 1;
+    size_t curr = 3;
+    jacobSequence.push_back(1);
+    jacobSequence.push_back(3);
+    while (curr < pend.size())
+    {
+        size_t next = curr + (2 * prev);
+        jacobSequence.push_back(next);
+        prev = curr;
+        curr = next;
+    }
+
+    std::deque<size_t> insertOrder;
+    size_t lastJac = 1;
+    for (size_t i = 1; i < jacobSequence.size(); ++i)
+    {
+        size_t j = jacobSequence[i];
+        if (j > pend.size())
+            j = pend.size(); 
+            
+        for (size_t k = j; k > lastJac; --k)
+        {
+            insertOrder.push_back(k - 1); 
+        }
+        lastJac = j;
+    }
+
+    for (size_t i = 0; i < insertOrder.size(); ++i)
+    {
+        size_t index = insertOrder[i];
+	
+        if (index == 0) continue; 
+	
+    	int valueToInsert = pend[index];
+        std::deque<int>::iterator bound;
+        if (hasStraggler && index == pend.size() - 1)
+        {
+            bound = mainChain.end();
+        }
+        else
+        {
+            int winnerValue = originalMainChain[index];
+		
+            bound = std::find(mainChain.begin(), mainChain.end(), winnerValue);
+        }
+		
+        std::deque<int>::iterator it = std::lower_bound(mainChain.begin(), bound, valueToInsert); 
+		
+    	mainChain.insert(it, valueToInsert);
+    }
+    arr = mainChain;
+
 }
