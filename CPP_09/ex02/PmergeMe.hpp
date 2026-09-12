@@ -21,6 +21,7 @@ class PmergeMe
         void parseInput(int argc, char **argv);
 		long calculateTimeDiff(const struct timeval& start, const struct timeval& end) const;
 		void mergeInsertSortVector(std::vector<int> &arr);
+		void mergeInsertSortDeque(std::deque<int> &arr);
 
         void sortVector();
         void sortDeque();
